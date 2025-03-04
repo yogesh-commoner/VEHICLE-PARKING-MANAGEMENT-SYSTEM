@@ -1,0 +1,84 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+import random
+from datetime import datetime
+class ParkingManagementSystem(tk.Tk):
+def __init__(self):
+super().__init__()
+self.title("Parking Management System")
+self.geometry("400x300")
+self.parkingSlots = {i: None for i in range(1, 201)}
+self.timeLabel = tk.Label(self)
+self.statusLabel = tk.Label(self)
+self.parkButton = tk.Button(self, text="Park Car", command=self.park_car)
+self.exitButton = tk.Button(self, text="Exit", command=self.exit_car)
+self.infoButton = tk.Button(self, text="Information",
+command=self.show_info)
+self.payButton = tk.Button(self, text="Pay", command=self.pay)
+self.vehicleNumberEntry = tk.Entry(self)
+self.vehicleNumberEntry.pack()
+self.parkButton.pack()
+self.exitButton.pack()
+self.infoButton.pack()
+self.payButton.pack()
+self.timeLabel.pack()
+self.statusLabel.pack()
+self.update_time()
+self.timer = self.after(1000, self.update_time)
+def park_car(self):
+vehicleNumber = self.vehicleNumberEntry.get()
+slotNumber = self.find_available_slot()
+if slotNumber != -1:
+self.parkingSlots[slotNumber] = vehicleNumber
+messagebox.showinfo("", f"Vehicle parked in slot {slotNumber}")
+else:
+messagebox.showinfo("", "No available slots")
+self.vehicleNumberEntry.delete(0, "end")
+def exit_car(self):
+vehicleNumber = simpledialog.askstring("Enter Vehicle Number", "Enter
+Vehicle Number:")
+slotNumber = self.find_slot_by_vehicle_number(vehicleNumber)
+if slotNumber != -1:
+self.parkingSlots[slotNumber] = None
+hoursParked = self.calculate_hours_parked(slotNumber)
+amountToPay = self.calculate_amount_to_pay(hoursParked)
+messagebox.showinfo("", f"Vehicle {vehicleNumber} exited from slot
+{slotNumber}\nAmount to pay: {amountToPay}")
+else:
+messagebox.showinfo("", "Vehicle not found")
+def show_info(self):
+info = ""
+for slotNumber, vehicleNumber in self.parkingSlots.items():
+if vehicleNumber is not None:
+info += f"Slot {slotNumber}: {vehicleNumber}\n"
+else:
+info += f"Slot {slotNumber}: Empty\n"
+messagebox.showinfo("", info)
+def pay(self):
+counterNumber = random.randint(1, 3)
+messagebox.showinfo("", f"Please go to counter {counterNumber} for
+payment")
+def find_available_slot(self):
+for slotNumber, vehicleNumber in self.parkingSlots.items():
+if vehicleNumber is None:
+return slotNumber
+return -1
+def find_slot_by_vehicle_number(self, vehicleNumber):
+for slotNumber, parkedVehicleNumber in self.parkingSlots.items():
+if vehicleNumber == parkedVehicleNumber:
+return slotNumber
+return -1
+def calculate_hours_parked(self, slotNumber):
+return 0 # Implement your logic for calculating hours parked
+def calculate_amount_to_pay(self, hoursParked):
+amount = 30
+if hoursParked > 1:
+amount += (hoursParked - 1) * 10
+return amount
+def update_time(self):
+current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+self.timeLabel.config(text=f"Current Time: {current_time}")
+self.timer = self.after(1000, self.update_time)
+if __name__ == "__main__":
+parking_system = ParkingManagementSystem()
+parking_system.mainloop()
